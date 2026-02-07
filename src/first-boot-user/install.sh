@@ -6,6 +6,13 @@ USER_UID="${USER_UID:-${USERUID:-${userUid:-1000}}}"
 USER_GID="${USER_GID:-${USERGID:-${userGid:-1000}}}"
 USER_HOME="${USER_HOME:-${home:-/home/${USERNAME}}}"
 
+if ! id -u "$USERNAME" >/dev/null 2>&1; then
+  existing_user="$(getent passwd "$USER_UID" 2>/dev/null | cut -d: -f1 || true)"
+  if [ -n "$existing_user" ]; then
+    USERNAME="$existing_user"
+  fi
+fi
+
 if ! getent group "$USER_GID" >/dev/null 2>&1; then
   groupadd -g "$USER_GID" "$USERNAME" || true
 fi
